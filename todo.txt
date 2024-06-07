@@ -1,0 +1,30 @@
+components
+finished: CardForm, DeckForm, Navbar, NotFound
+unfinished: CardCard, DeckCard, Flashcard 
+!! selection dialog of all cards + removal of cards in deck
+
+pages: 
+finished: 404, Auth, Categories, Users, Cards/Decks add/edit
+unfinished: Cards/Decks index, Home, 
+
+to do:
+filter cards/decks by user_id at Home
+select on home page?
+
+// Edit Deck: cards array
+if checked, filter out
+if unchecked, .push()
+
+// Add to Deck
+modal/dialog, checkbox value={deck_id} -> Add button;
+if checked=true, [deck id array].map((deck_id) => (deck_.id).populate.card.push(card_id));
+
+only if have time:
+refactor imageMutation fns?
+.map some form fields?
+remove comments/unused
+
+???
+study session; .map() to cardflip; close button (renavigates to page), next (closes card); showing the next
+Card flip; next -> card
+
