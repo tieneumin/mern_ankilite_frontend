@@ -1,190 +1,232 @@
 import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useCookies } from "react-cookie";
 
-import { getCategories } from "../../utils/api_categories";
-import { getCard, addCard, updateCard, getCards } from "../../utils/api_cards";
-import { uploadImage } from "../../utils/api_images";
+import { getDeck, updateDeck, deleteDeck } from "../../utils/api_decks";
+import { getCards } from "../../utils/api_cards";
 
 import {
+  AppBar,
   Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Checkbox,
-  Chip,
-  FormControlLabel,
+  Container,
+  Dialog,
+  DialogContent,
+  Divider,
   Grid,
   IconButton,
-  MenuItem,
-  Select,
-  TextField,
+  Toolbar,
   Typography,
 } from "@mui/material";
-import {
-  AccountCircle,
-  Clear,
-  Delete,
-  Edit,
-  Info,
-  LibraryAdd,
-  Upload,
-} from "@mui/icons-material";
+import { Close, Delete, LibraryAdd, Save } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 
-import { Container } from "@mui/material";
-
 import Navbar from "../../components/Navbar";
-import { getDeck } from "../../utils/api_decks";
-import CardCard from "../../components/CardCard";
 import NotFound from "../../components/NotFound";
+import FormDialogButton from "../../components/FormDialogButton";
+import DeckCard from "../../components/DeckCard";
+import CardCard from "../../components/CardCard";
+import Filters from "../../components/Filters";
 
 export default function DeckDetails() {
-  // !! error if unlogged in user accesses
-  // Cannot read properties of undefined (reading 'includes')
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
   const [cookies] = useCookies(["session"]);
-  const { session: { _id: user_id, role, token } = {} } = cookies;
+  const { session: { _id, role, token } = {} } = cookies;
 
-  const { data: allCards = [] } = useQuery({
-    queryKey: ["cards"],
-    queryFn: () => getCards(),
+  const [category, setCategory] = useState("all");
+
+  const [editDialog, setEditDialog] = useState(false);
+  const [editCards, setEditCards] = useState([]);
+
+  const { data: cards = [] } = useQuery({
+    queryKey: ["cards", category],
+    queryFn: () => getCards(category),
   });
 
-  const [aa, setCards] = useState([]);
-
-  const { data: deck = [] } = useQuery({
+  const {
+    data: deck,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["deck", id],
     queryFn: () => getDeck(id),
   });
-  const { title, description, category, creator, cards } = deck;
 
-  // useEffect(() => {
-  //   if (deck) {
-  //     if (user_id === deck.creator || role === "admin") {
-  //       enqueueSnackbar("Action forbidden.", {
-  //         variant: "error",
-  //       });
-  //       navigate("/cards");
-  //     }
-  //     setCards(deck.cards);
-  //   }
-  // }, [deck]);
-
-  console.log(category);
-  const handleCards = (card_id) => {
-    if (!cards.includes(card_id)) {
-      setCards([...cards, card_id]);
-    } else {
-      setCards(cards.filter((id) => id !== card_id));
+  useEffect(() => {
+    if (deck) {
+      setEditCards(deck.cards.map((card) => card?._id));
     }
+  }, [deck]);
+
+  const mutationUpdateDeck = useMutation({
+    mutationFn: updateDeck,
+    onSuccess: () => {
+      enqueueSnackbar("Deck updated.", { variant: "success" });
+      queryClient.invalidateQueries({ queryKey: ["deck"] });
+      setEditDialog(false);
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.response.data.message, { variant: "error" });
+    },
+  });
+  const handleUpdateDeck = () => {
+    mutationUpdateDeck.mutate({
+      ...deck,
+      cards: editCards,
+      token,
+    });
+  };
+
+  const mutationDeleteDeck = useMutation({
+    mutationFn: deleteDeck,
+    onSuccess: () => {
+      enqueueSnackbar("Deck deleted.", { variant: "success" });
+      navigate("/decks");
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.response.data.message, { variant: "error" });
+    },
+  });
+  const handleDeleteDeck = () => {
+    if (window.confirm("Delete deck?"))
+      mutationDeleteDeck.mutate({ _id: id, token });
   };
 
   return (
     <>
       <Navbar />
-      <Container>
-        <Card>
-          <CardContent sx={{ pb: 0 }}>
-            <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
-              <Chip
-                size="small"
-                icon={<AccountCircle />}
-                label={
-                  <Typography variant="inherit" noWrap>
-                    {creator ? creator.username : "-"}
-                  </Typography>
-                }
-                style={{ maxWidth: "48%" }}
-              />
-              <Chip
-                size="small"
-                icon={<Info />}
-                label={
-                  <Typography variant="inherit" noWrap>
-                    {category ? category.name : "-"}
-                  </Typography>
-                }
-                style={{ maxWidth: "48%" }}
-              />
-            </Box>
-            <Typography fontWeight="bold" noWrap>
-              {title}
+      {isLoading ? (
+        <Box align="center">
+          Loading...
+          <LoadingButton loading></LoadingButton>
+        </Box>
+      ) : isError ? (
+        <NotFound type="deck" />
+      ) : (
+        <Container maxWidth="xl">
+          <Box display="flex" alignItems="center" sx={{ mb: 1 }}>
+            <Typography variant="h5" fontWeight="bold" sx={{ mr: 1.25 }}>
+              Deck Details
             </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              style={{
-                fontStyle: description ? null : "italic",
-                wordBreak: "break-word",
-              }}
-            >
-              {description ? description : "No description added."}
+            {deck.creator?._id === _id || role === "admin" ? (
+              <>
+                <FormDialogButton
+                  operation="edit"
+                  type="deck"
+                  id={id}
+                  sx={{ p: 0 }}
+                />
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={handleDeleteDeck}
+                >
+                  <Delete />
+                </IconButton>
+              </>
+            ) : null}
+          </Box>
+          <DeckCard type="details" deck={deck} />
+          <Divider sx={{ mt: 3, mb: 1 }} />
+
+          <Box display="flex" alignItems="center" sx={{ my: 1 }}>
+            <Typography variant="h6" fontWeight="bold" sx={{ mr: 1.25 }}>
+              Cards ({deck.cards.length})
             </Typography>
-          </CardContent>
-          {creator?._id === user_id || role === "admin" ? (
-            <CardActions style={{ display: "flex", justifyContent: "end" }}>
+            {deck.creator?._id === _id || role === "admin" ? (
               <IconButton
                 color="primary"
-                size="small"
                 onClick={() => {
-                  navigate(`/decks/${id}/edit`);
+                  setEditDialog(true);
                 }}
               >
-                <Edit />
+                <LibraryAdd />
               </IconButton>
-              <IconButton
-                color="error"
-                size="small"
-                // onClick={handleDeleteDeck}
-              >
-                <Delete />
-              </IconButton>
-            </CardActions>
-          ) : null}
-        </Card>
-
-        <Grid item xs={12}>
-          <Typography variant="subtitle">Select Cards:</Typography>
-          <Grid container spacing={1}>
-            {allCards.map((c) => (
-              <Grid key={c._id} item md={4} sm={6} xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      color="primary"
-                      checked={cards.includes(c._id)}
-                      onChange={() => handleCards(c._id)}
-                    />
-                  }
-                  label={`${c.fTitle} / ${c.bTitle} `}
-                />
+            ) : null}
+          </Box>
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            {deck.cards.length > 0 ? (
+              deck.cards.map((card) => {
+                return (
+                  <Grid key={card._id} item md={4} sm={6} xs={12}>
+                    <CardCard card={card} details />
+                  </Grid>
+                );
+              })
+            ) : (
+              <Grid item flex="1">
+                <Typography fontStyle="italic" textAlign="center">
+                  No cards in deck.
+                </Typography>
               </Grid>
-            ))}
+            )}
           </Grid>
-        </Grid>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          {cards && cards.length > 0 ? (
-            cards.map((card) => {
-              return (
-                <Grid key={card._id} item md={4} sm={6} xs={12}>
-                  <CardCard card={card} />
-                </Grid>
-              );
-            })
-          ) : (
-            <Grid item>
-              <Typography align="center">No cards found.</Typography>
-            </Grid>
-          )}
-        </Grid>
-      </Container>
+
+          <Dialog
+            fullWidth
+            maxWidth="xl"
+            open={editDialog}
+            onClose={() => setEditDialog(false)}
+          >
+            <AppBar position="relative">
+              <Toolbar>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  sx={{ mr: 1 }}
+                  onClick={() => setEditDialog(false)}
+                >
+                  <Close />
+                </IconButton>
+                <Typography variant="h6" flex="1">
+                  Edit cards in deck
+                </Typography>
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleUpdateDeck}
+                >
+                  <Save />
+                </IconButton>
+              </Toolbar>
+            </AppBar>
+            <DialogContent>
+              <Filters
+                type="card"
+                category={category}
+                setCategory={setCategory}
+              />
+              <Grid container spacing={1}>
+                {cards.length > 0 ? (
+                  cards.map((card) => {
+                    return (
+                      <Grid key={card._id} item md={4} sm={6} xs={12}>
+                        <CardCard
+                          card={card}
+                          checkbox
+                          editCards={editCards}
+                          setEditCards={setEditCards}
+                        />
+                      </Grid>
+                    );
+                  })
+                ) : (
+                  <Grid item flex="1">
+                    <Typography fontStyle="italic" textAlign="center">
+                      No cards found.
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </DialogContent>
+          </Dialog>
+        </Container>
+      )}
     </>
   );
 }

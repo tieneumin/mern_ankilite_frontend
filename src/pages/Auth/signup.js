@@ -138,68 +138,11 @@ export default function SignUp() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </Grid>
-              {/* <Grid item sm={6} xs={12}>
-                <Typography variant="subtitle">Username</Typography>
-                <Typography variant="subtitle" color="red">
-                  *
-                </Typography>
-                <TextField
-                  autoFocus
-                  fullWidth
-                  size="small"
-                  sx={{ mt: 0.5 }}
-                  value={username}
-                  inputProps={{ maxLength: 24 }}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <Typography variant="subtitle">Email</Typography>
-                <Typography variant="subtitle" color="red">
-                  *
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  sx={{ mt: 0.5 }}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <Typography variant="subtitle">Password</Typography>
-                <Typography variant="subtitle" color="red">
-                  *
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  sx={{ mt: 0.5 }}
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <Typography variant="subtitle">Confirm Password</Typography>
-                <Typography variant="subtitle" color="red">
-                  *
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  sx={{ mt: 0.5 }}
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </Grid> */}
-
               <Grid item xs={12}>
                 <Button
                   fullWidth
                   variant="contained"
-                  sx={{ textTransform: "capitalize", mt: 0.5 }}
+                  sx={{ mt: 0.5, textTransform: "capitalize" }}
                   onClick={handleSignUp}
                 >
                   Sign Up

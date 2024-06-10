@@ -1,27 +1,10 @@
 import { useState } from "react";
 
 import ReactCardFlip from "react-card-flip";
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardActions,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Chip,
-  IconButton,
-  Typography,
-} from "@mui/material";
-import { AccountCircle, Close, Info } from "@mui/icons-material";
+import { Card, CardActionArea, CardHeader, CardMedia } from "@mui/material";
 
 export default function Flashcard({ card }) {
-  const { fTitle, fDesc, fImage, bTitle, bDesc, bImage, category, creator } =
-    card;
-
-  //
-  console.log(card);
-  //
+  const { fTitle, fDesc, fImage, bTitle, bDesc, bImage } = card;
 
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -31,102 +14,50 @@ export default function Flashcard({ card }) {
   };
 
   return (
-    <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical">
+    <ReactCardFlip isFlipped={isFlipped}>
       <Card key="front">
-        <CardActionArea onClick={handleClick}>
+        <CardActionArea
+          sx={{ minHeight: { sm: "480px", xs: "320px" } }}
+          onClick={handleClick}
+        >
           <CardHeader
+            style={{ textAlign: "center", wordBreak: "break-word" }}
             title={fTitle}
-            subheader={
-              <Box display="flex" justifyContent="space-between">
-                <Chip
-                  size="small"
-                  icon={<AccountCircle />}
-                  label={
-                    <Typography variant="inherit" noWrap>
-                      {creator ? creator.username : "-"}
-                    </Typography>
-                  }
-                  style={{ maxWidth: "48%" }}
-                />
-                <Chip
-                  size="small"
-                  icon={<Info />}
-                  label={
-                    <Typography variant="inherit" noWrap>
-                      {category ? category.name : "-"}
-                    </Typography>
-                  }
-                  style={{ maxWidth: "48%" }}
-                />
-              </Box>
-            }
-            action={
-              <IconButton>
-                <Close />
-              </IconButton>
-            }
+            subheader={fDesc}
           />
-          {fDesc ? (
-            <CardContent>
-              <Typography variant="body2" color="text.secondary" paragraph>
-                {fDesc}
-              </Typography>
-            </CardContent>
-          ) : null}
           {fImage ? (
             <CardMedia
-              component="img"
+              sx={{
+                maxHeight: { sm: "240px", xs: "160px" },
+                width: { sm: "240px", xs: "160px" },
+                margin: "auto",
+              }}
               image={`http://localhost:1337/${fImage}`}
+              component="img"
               alt="fImage"
             />
           ) : null}
         </CardActionArea>
       </Card>
-      <Card key="front">
-        <CardActionArea onClick={handleClick}>
+      <Card key="back">
+        <CardActionArea
+          sx={{ minHeight: { sm: "480px", xs: "320px" } }}
+          onClick={handleClick}
+        >
           <CardHeader
+            style={{ textAlign: "center", wordBreak: "break-word" }}
             title={bTitle}
-            subheader={
-              <Box display="flex" justifyContent="space-between">
-                <Chip
-                  size="small"
-                  icon={<AccountCircle />}
-                  label={
-                    <Typography variant="inherit" noWrap>
-                      {creator ? creator.username : "-"}
-                    </Typography>
-                  }
-                  style={{ maxWidth: "48%" }}
-                />
-                <Chip
-                  size="small"
-                  icon={<Info />}
-                  label={
-                    <Typography variant="inherit" noWrap>
-                      {category ? category.name : "-"}
-                    </Typography>
-                  }
-                  style={{ maxWidth: "48%" }}
-                />
-              </Box>
-            }
-            action={
-              <IconButton>
-                <Close />
-              </IconButton>
-            }
+            subheader={bDesc}
           />
-          {bDesc ? (
-            <CardContent>
-              <Typography variant="body2" color="text.secondary" paragraph>
-                {bDesc}
-              </Typography>
-            </CardContent>
-          ) : null}
           {bImage ? (
             <CardMedia
-              component="img"
+              sx={{
+                maxHeight: { sm: "240px", xs: "160px" },
+                width: { sm: "240px", xs: "160px" },
+                margin: "auto",
+              }}
               image={`http://localhost:1337/${bImage}`}
+              component="img"
               alt="fImage"
             />
           ) : null}

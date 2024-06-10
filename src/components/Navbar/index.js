@@ -39,9 +39,9 @@ export default function Navbar() {
           sx={{ mr: 1.5, flex: { sm: 0, xs: 1 } }}
         >
           <IconButton
-            size="large"
-            edge="start"
             color="inherit"
+            edge="start"
+            size="large"
             onClick={() => {
               navigate("/");
             }}
@@ -67,59 +67,45 @@ export default function Navbar() {
           }}
         >
           <Box>
-            <Button
-              style={{
-                color: location.pathname === "/cards" ? "#1976d2" : "inherit",
-                backgroundColor:
-                  location.pathname === "/cards" ? "white" : null,
-                fontWeight: location.pathname === "/cards" ? "bold" : null,
-              }}
-              onClick={() => navigate("/cards")}
-            >
-              Cards
-            </Button>
-            <Button
-              style={{
-                color: location.pathname === "/decks" ? "#1976d2" : "inherit",
-                backgroundColor:
-                  location.pathname === "/decks" ? "white" : null,
-                fontWeight: location.pathname === "/decks" ? "bold" : null,
-              }}
-              onClick={() => navigate("/decks")}
-            >
-              Decks
-            </Button>
-            {role === "admin" ? (
-              <>
+            {["cards", "decks"].map((x1, i) => {
+              return (
                 <Button
+                  key={i}
                   style={{
                     color:
-                      location.pathname === "/categories"
-                        ? "#1976d2"
-                        : "inherit",
+                      location.pathname === `/${x1}` ? "#1976d2" : "inherit",
                     backgroundColor:
-                      location.pathname === "/categories" ? "white" : null,
-                    fontWeight:
-                      location.pathname === "/categories" ? "bold" : null,
+                      location.pathname === `/${x1}` ? "white" : null,
+                    fontWeight: location.pathname === `/${x1}` ? "bold" : null,
                   }}
-                  onClick={() => navigate("/categories")}
+                  onClick={() => navigate(`/${x1}`)}
                 >
-                  Categories
+                  {x1}
                 </Button>
-                <Button
-                  style={{
-                    color:
-                      location.pathname === "/users" ? "#1976d2" : "inherit",
-                    backgroundColor:
-                      location.pathname === "/users" ? "white" : null,
-                    fontWeight: location.pathname === "/users" ? "bold" : null,
-                  }}
-                  onClick={() => navigate("/users")}
-                >
-                  Users
-                </Button>
-              </>
-            ) : null}
+              );
+            })}
+            {role === "admin"
+              ? ["categories", "users"].map((x2, i) => {
+                  return (
+                    <Button
+                      key={i}
+                      style={{
+                        color:
+                          location.pathname === `/${x2}`
+                            ? "#1976d2"
+                            : "inherit",
+                        backgroundColor:
+                          location.pathname === `/${x2}` ? "white" : null,
+                        fontWeight:
+                          location.pathname === `/${x2}` ? "bold" : null,
+                      }}
+                      onClick={() => navigate(`/${x2}`)}
+                    >
+                      {x2}
+                    </Button>
+                  );
+                })
+              : null}
           </Box>
 
           <Box>
@@ -128,32 +114,24 @@ export default function Navbar() {
                 Logout
               </Button>
             ) : (
-              <>
-                <Button
-                  style={{
-                    color:
-                      location.pathname === "/login" ? "#1976d2" : "inherit",
-                    backgroundColor:
-                      location.pathname === "/login" ? "white" : null,
-                    fontWeight: location.pathname === "/login" ? "bold" : null,
-                  }}
-                  onClick={() => navigate("/login")}
-                >
-                  Login
-                </Button>
-                <Button
-                  style={{
-                    color:
-                      location.pathname === "/signup" ? "#1976d2" : "inherit",
-                    backgroundColor:
-                      location.pathname === "/signup" ? "white" : null,
-                    fontWeight: location.pathname === "/signup" ? "bold" : null,
-                  }}
-                  onClick={() => navigate("/signup")}
-                >
-                  Sign Up
-                </Button>
-              </>
+              ["login", "signup"].map((x3, i) => {
+                return (
+                  <Button
+                    key={i}
+                    style={{
+                      color:
+                        location.pathname === `/${x3}` ? "#1976d2" : "inherit",
+                      backgroundColor:
+                        location.pathname === `/${x3}` ? "white" : null,
+                      fontWeight:
+                        location.pathname === `/${x3}` ? "bold" : null,
+                    }}
+                    onClick={() => navigate(`/${x3}`)}
+                  >
+                    {x3}
+                  </Button>
+                );
+              })
             )}
           </Box>
         </Box>
@@ -173,83 +151,64 @@ export default function Navbar() {
             open={openNavMenu}
             onClose={() => setOpenNavMenu(false)}
           >
-            <MenuItem onClick={() => navigate("/cards")}>
-              <Typography
-                style={{
-                  color: location.pathname === "/cards" ? "#1976d2" : null,
-                  fontWeight: location.pathname === "/cards" ? "bold" : null,
-                }}
-              >
-                Cards
-              </Typography>
-            </MenuItem>
-            <MenuItem onClick={() => navigate("/decks")}>
-              <Typography
-                style={{
-                  color: location.pathname === "/decks" ? "#1976d2" : null,
-                  fontWeight: location.pathname === "/decks" ? "bold" : null,
-                }}
-              >
-                Decks
-              </Typography>
-            </MenuItem>
-            {role === "admin" ? (
-              <Box>
-                <MenuItem onClick={() => navigate("/categories")}>
+            {["cards", "decks"].map((x1r, i) => {
+              return (
+                <MenuItem key={i} onClick={() => navigate(`/${x1r}`)}>
                   <Typography
                     style={{
-                      color:
-                        location.pathname === "/categories" ? "#1976d2" : null,
+                      color: location.pathname === `/${x1r}` ? "#1976d2" : null,
                       fontWeight:
-                        location.pathname === "/categories" ? "bold" : null,
+                        location.pathname === `/${x1r}` ? "bold" : null,
+                      textTransform: "capitalize",
                     }}
                   >
-                    Categories
+                    {x1r}
                   </Typography>
                 </MenuItem>
-                <MenuItem onClick={() => navigate("/users")}>
-                  <Typography
-                    style={{
-                      color: location.pathname === "/users" ? "#1976d2" : null,
-                      fontWeight:
-                        location.pathname === "/users" ? "bold" : null,
-                    }}
-                  >
-                    Users
-                  </Typography>
-                </MenuItem>
-              </Box>
-            ) : null}
+              );
+            })}
+            {role === "admin"
+              ? ["categories", "users"].map((x2r, i) => {
+                  return (
+                    <MenuItem key={i} onClick={() => navigate(`/${x2r}`)}>
+                      <Typography
+                        style={{
+                          color:
+                            location.pathname === `/${x2r}` ? "#1976d2" : null,
+                          fontWeight:
+                            location.pathname === `/${x2r}` ? "bold" : null,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {x2r}
+                      </Typography>
+                    </MenuItem>
+                  );
+                })
+              : null}
             <Divider />
             {role ? (
               <MenuItem onClick={handleLogout}>
                 <Typography>Logout</Typography>
               </MenuItem>
             ) : (
-              <Box>
-                <MenuItem onClick={() => navigate("/login")}>
-                  <Typography
-                    style={{
-                      color: location.pathname === "/login" ? "#1976d2" : null,
-                      fontWeight:
-                        location.pathname === "/login" ? "bold" : null,
-                    }}
-                  >
-                    Login
-                  </Typography>
-                </MenuItem>
-                <MenuItem onClick={() => navigate("/signup")}>
-                  <Typography
-                    style={{
-                      color: location.pathname === "/signup" ? "#1976d2" : null,
-                      fontWeight:
-                        location.pathname === "/signup" ? "bold" : null,
-                    }}
-                  >
-                    Sign Up
-                  </Typography>
-                </MenuItem>
-              </Box>
+              ["login", "signup"].map((x3r, i) => {
+                return (
+                  <MenuItem key={i} onClick={() => navigate(`/${x3r}`)}>
+                    <Typography
+                      style={{
+                        color:
+                          location.pathname === `/${x3r}` ? "#1976d2" : null,
+                        fontWeight:
+                          location.pathname === `/${x3r}` ? "bold" : null,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {x3r}
+                    </Typography>
+                  </MenuItem>
+                );
+              })
             )}
           </Menu>
         </Box>

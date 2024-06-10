@@ -1,51 +1,50 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useCookies } from "react-cookie";
 
 import { deleteCard } from "../../utils/api_cards";
-// import { addCartItem } from "../../utils/api_cart";
 
 import {
-  AppBar,
   Box,
-  Button,
   Card,
   CardActions,
   CardContent,
+  Checkbox,
   Chip,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   IconButton,
-  Toolbar,
   Typography,
 } from "@mui/material";
 import {
   AccountCircle,
   Close,
   Delete,
-  Edit,
   Info,
-  LibraryAdd,
   Visibility,
-  Send,
-  Cancel,
 } from "@mui/icons-material";
+
+import FormDialogButton from "../FormDialogButton";
 import Flashcard from "../Flashcard";
 
-export default function CardCard({ card }) {
+export default function CardCard({
+  card,
+  details,
+  checkbox,
+  editCards,
+  setEditCards,
+}) {
   const { _id, fTitle, fDesc, bTitle, bDesc, category, creator } = card;
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
   const [cookies] = useCookies(["session"]);
   const { session: { _id: user_id, role, token } = {} } = cookies;
 
-  const [openPreviewModal, setOpenPreviewModal] = useState(false);
+  const [previewDialog, setPreviewDialog] = useState(false);
 
   const mutationDeleteCard = useMutation({
     mutationFn: deleteCard,
@@ -62,48 +61,43 @@ export default function CardCard({ card }) {
       mutationDeleteCard.mutate({ _id, token });
   };
 
-  // const addCartItemMutation = useMutation({
-  //   mutationFn: addCartItem,
-  //   onSuccess: () => {
-  //     // success message
-  //     enqueueSnackbar("Item added to cart.", {
-  //       variant: "success",
-  //     });
-  //   },
-  //   onError: (error) => {
-  //     // error message
-  //     enqueueSnackbar(error.response.data.message, {
-  //       variant: "error",
-  //     });
-  //   },
-  // });
+  const handleCardsInDeck = (cardId) => {
+    if (!editCards?.includes(cardId)) {
+      setEditCards([...editCards, cardId]);
+    } else {
+      setEditCards(editCards.filter((id) => id !== cardId));
+    }
+  };
 
   return (
     <>
       <Card>
         <CardContent sx={{ pb: 1 }}>
-          <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
-            <Chip
-              size="small"
-              icon={<AccountCircle />}
-              label={
-                <Typography variant="inherit" noWrap>
-                  {creator ? creator.username : "-"}
-                </Typography>
-              }
-              style={{ maxWidth: "48%" }}
-            />
-            <Chip
-              size="small"
-              icon={<Info />}
-              label={
-                <Typography variant="inherit" noWrap>
-                  {category ? category.name : "-"}
-                </Typography>
-              }
-              style={{ maxWidth: "48%" }}
-            />
-          </Box>
+          {!details ? (
+            <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
+              <Chip
+                size="small"
+                icon={<AccountCircle />}
+                label={
+                  <Typography variant="inherit" noWrap>
+                    {creator ? creator.username : "-"}
+                  </Typography>
+                }
+                style={{ maxWidth: "48%" }}
+              />
+              <Chip
+                size="small"
+                icon={<Info />}
+                label={
+                  <Typography variant="inherit" noWrap>
+                    {category ? category.name : "-"}
+                  </Typography>
+                }
+                style={{ maxWidth: "48%" }}
+              />
+            </Box>
+          ) : null}
+
           <Typography fontWeight="bold" noWrap>
             {fTitle}
           </Typography>
@@ -131,66 +125,56 @@ export default function CardCard({ card }) {
           </Typography>
         </CardContent>
         <CardActions>
-          <IconButton
-            size="small"
-            onClick={() => {
-              setOpenPreviewModal(true);
-            }}
-          >
-            <Visibility />
-          </IconButton>
-          <IconButton size="small">
-            <LibraryAdd />
-          </IconButton>
-          {creator?._id === user_id || role === "admin" ? (
-            <>
-              <IconButton
-                color="primary"
-                size="small"
-                onClick={() => {
-                  navigate(`/cards/${_id}/edit`);
-                }}
-              >
-                <Edit />
-              </IconButton>
-              <IconButton color="error" size="small" onClick={handleDeleteCard}>
-                <Delete />
-              </IconButton>
-            </>
+          <Box flex="1">
+            <IconButton
+              size="small"
+              onClick={() => {
+                setPreviewDialog(true);
+              }}
+            >
+              <Visibility />
+            </IconButton>
+            {creator?._id === user_id || role === "admin" ? (
+              <>
+                <FormDialogButton operation="edit" type="card" id={_id} />
+                <IconButton
+                  color="error"
+                  size="small"
+                  onClick={handleDeleteCard}
+                >
+                  <Delete />
+                </IconButton>
+              </>
+            ) : null}
+          </Box>
+          {checkbox ? (
+            <FormControlLabel
+              sx={{ mr: 0 }}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={editCards?.includes(_id)}
+                  onChange={() => handleCardsInDeck(_id)}
+                />
+              }
+            />
           ) : null}
         </CardActions>
       </Card>
 
       <Dialog
-        open={openPreviewModal}
-        onClose={() => setOpenPreviewModal(false)}
+        fullWidth
+        open={previewDialog}
+        onClose={() => setPreviewDialog(false)}
       >
-        {/* <AppBar position="relative"> */}
-        <Toolbar>
-          <Typography variant="h6" style={{ flex: 1 }}>
+        <DialogTitle display="flex" alignItems="center">
+          <Typography variant="inherit" flex="1">
             Preview
           </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={() => setOpenPreviewModal(false)}
-          >
+          <IconButton onClick={() => setPreviewDialog(false)}>
             <Close />
           </IconButton>
-        </Toolbar>
-        {/* </AppBar> */}
-        {/* <DialogTitle
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography>Preview</Typography>
-          <IconButton onClick={() => setOpenPreviewModal(false)}>
-            <Close />
-          </IconButton>
-        </DialogTitle> */}
+        </DialogTitle>
         <DialogContent>
           <Flashcard card={card} />
         </DialogContent>

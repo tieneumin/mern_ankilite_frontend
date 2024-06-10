@@ -1,6 +1,0 @@
-style={{
-  width: "90%",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-}}

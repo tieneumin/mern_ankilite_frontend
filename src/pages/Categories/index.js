@@ -45,7 +45,7 @@ export default function Categories() {
 
   const [name, setName] = useState("");
 
-  const [openEditModal, setOpenEditModal] = useState(false);
+  const [editDialog, setEditDialog] = useState(false);
   const [editId, setEditId] = useState("");
   const [editName, setEditName] = useState("");
 
@@ -60,8 +60,6 @@ export default function Categories() {
       navigate("/");
     }
   });
-
-  let mutaType = "";
 
   const mutationAddCategory = useMutation({
     mutationFn: addCategory,
@@ -87,7 +85,7 @@ export default function Categories() {
     onSuccess: () => {
       enqueueSnackbar("Category updated.", { variant: "success" });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      setOpenEditModal(false);
+      setEditDialog(false);
     },
     onError: (error) => {
       enqueueSnackbar(error.response.data.message, { variant: "error" });
@@ -166,7 +164,7 @@ export default function Categories() {
                           color="primary"
                           size="small"
                           onClick={() => {
-                            setOpenEditModal(true);
+                            setEditDialog(true);
                             setEditId(c._id);
                             setEditName(c.name);
                           }}
@@ -195,7 +193,7 @@ export default function Categories() {
           </Table>
         </TableContainer>
 
-        <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+        <Dialog open={editDialog} onClose={() => setEditDialog(false)}>
           <DialogTitle>Edit Category</DialogTitle>
           <DialogContent sx={{ pb: 0 }}>
             <TextField
@@ -206,7 +204,7 @@ export default function Categories() {
             />
           </DialogContent>
           <DialogActions>
-            <IconButton color="error" onClick={() => setOpenEditModal(false)}>
+            <IconButton color="error" onClick={() => setEditDialog(false)}>
               <Cancel />
             </IconButton>
             <IconButton color="primary" onClick={handleUpdateCategory}>

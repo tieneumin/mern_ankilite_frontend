@@ -3,17 +3,9 @@ import axios from "axios";
 import { url } from "./data";
 
 // GET /decks
-export const getDecks = async (category, creator) => {
-  // prev params: category, page, perPage
-  // add user for home filter
-  const params = {
-    //   page,
-    //   perPage,
-  };
-  if (category !== "all") params.category = category; // ?category={category}
-  if (creator !== undefined) params.creator = creator;
-  // console.log(creator);
-  // console.log(params.creator);
+export const getDecks = async (category = "all") => {
+  const params = {};
+  if (category !== "all") params.category = category;
   const query = new URLSearchParams(params);
   const res = await axios.get(`${url}/decks?${query.toString()}`);
   return res.data;

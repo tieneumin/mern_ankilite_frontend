@@ -91,7 +91,7 @@ export default function Login() {
                 <Button
                   fullWidth
                   variant="contained"
-                  sx={{ textTransform: "capitalize", mt: 0.5 }}
+                  sx={{ mt: 0.5, textTransform: "capitalize" }}
                   onClick={handleLogin}
                 >
                   Log In

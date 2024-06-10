@@ -4,14 +4,8 @@ import { url } from "./data";
 
 // GET /cards
 export const getCards = async (category = "all") => {
-  // prev params: category, page, perPage
-  // add user for home filter
-  const params = {
-    //   page,
-    //   perPage,
-  };
-  if (category !== "all") params.category = category; // ?category=category
-  // console.log(params.category);
+  const params = {};
+  if (category !== "all") params.category = category;
   const query = new URLSearchParams(params);
   const res = await axios.get(`${url}/cards?${query.toString()}`);
   return res.data;
