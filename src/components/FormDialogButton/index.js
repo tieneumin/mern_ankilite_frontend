@@ -8,6 +8,7 @@ import { getCategories } from "../../utils/api_categories";
 import { getDeck, addDeck, updateDeck } from "../../utils/api_decks";
 import { getCard, addCard, updateCard } from "../../utils/api_cards";
 import { uploadImage } from "../../utils/api_images";
+import { url } from "../../utils/data";
 
 import {
   Box,
@@ -362,7 +363,7 @@ export default function FormDialogButton({ operation, type, id }) {
                       {fImage ? (
                         <>
                           <img
-                            src={`http://localhost:1337/${fImage}`}
+                            src={`${url}/${fImage}`}
                             height="128px"
                             width="128px"
                             alt="fImage"
@@ -403,7 +404,7 @@ export default function FormDialogButton({ operation, type, id }) {
                       {bImage ? (
                         <>
                           <img
-                            src={`http://localhost:1337/${bImage}`}
+                            src={`${url}/${bImage}`}
                             height="128px"
                             width="128px"
                             alt="bImage"

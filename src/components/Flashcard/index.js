@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { url } from "../../utils/data";
+
 import ReactCardFlip from "react-card-flip";
 import { Card, CardActionArea, CardHeader, CardMedia } from "@mui/material";
 
@@ -32,7 +34,7 @@ export default function Flashcard({ card }) {
                 width: { sm: "240px", xs: "160px" },
                 margin: "auto",
               }}
-              image={`http://localhost:1337/${fImage}`}
+              image={`${url}/${fImage}`}
               component="img"
               alt="fImage"
             />
@@ -56,7 +58,7 @@ export default function Flashcard({ card }) {
                 width: { sm: "240px", xs: "160px" },
                 margin: "auto",
               }}
-              image={`http://localhost:1337/${bImage}`}
+              image={`${url}/${bImage}`}
               component="img"
               alt="fImage"
             />
